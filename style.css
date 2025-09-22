@@ -55,9 +55,12 @@ body{
 /* Galeria */
 .gallery{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* menor tamanho, quadrado responsivo */
+  gap:8px;
   justify-content:center;
+  max-height:calc(100vh - 250px); /* limita altura para scroll */
+  overflow-y:auto;
+  padding:4px;
 }
 
 /* Cards quadrados */
@@ -80,15 +83,16 @@ body{
   transition:transform .28s ease, filter .28s ease;
 }
 .card .desc{
-  padding:6px;
-  font-size:0.85rem;
+  padding:4px;
+  font-size:0.7rem;
   text-align:center;
-  background:rgba(255,255,255,0.8);
+  background:rgba(255,255,255,0.75);
 }
 .card:hover img{
   transform:scale(1.05);
   filter:contrast(1.05) saturate(1.05);
 }
+
 
 /* Modal */
 .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1200}
