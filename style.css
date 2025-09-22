@@ -7,7 +7,7 @@ body {
 }
 
 header {
-  background: #1e1e1e;
+  background: #6a4fef; /* roxo claro */
   padding: 20px;
   text-align: center;
   box-shadow: 0 2px 5px rgba(0,0,0,0.5);
@@ -28,7 +28,7 @@ header {
 
 .add-photo button {
   padding: 10px 20px;
-  background: #ff4081;
+  background: #4fc3f7; /* azul claro */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -93,5 +93,17 @@ header {
   max-width: 90%;
   max-height: 90%;
   box-shadow: 0 0 20px #000;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff4081;
+  color: #fff;
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
