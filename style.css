@@ -40,7 +40,7 @@ body{
 }
 
 /* Para mover pro canto direito */
-.align-right {
+.align-center {
   align-self: flex-end;
 }
 
