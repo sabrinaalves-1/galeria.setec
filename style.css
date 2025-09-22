@@ -94,30 +94,27 @@ body{
 }
 
 
-/* Modal */
-.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1200}
-.modal.hidden{display:none}
-.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.5)}
-.modal-content{
-  position:relative;z-index:2;
-  background:var(--branco);
-  padding:12px;
-  border-radius:12px;
-  display:flex;
-  flex-direction:column;
+/* Modal (imagem ampliada) */
+.modal{
+  display:none;
+  position:fixed;
+  z-index:2000;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
   align-items:center;
-  gap:8px;
-  max-width:90vw
+  padding:10px;
 }
-.modal-content img{
-  max-width:70vw;
-  width:70vw;
-  height:auto;
-  transition:transform .2s ease, filter .2s ease
+.modal img{
+  max-width:90vw;   /* ocupa no máximo 90% da largura da tela */
+  max-height:80vh;  /* ocupa no máximo 80% da altura da tela */
+  border-radius:12px;
+  box-shadow:0 0 25px rgba(0,0,0,0.8);
+  object-fit:contain; /* mantém proporção sem estourar */
 }
-.modal-controls{display:flex;gap:8px}
-.modal-controls button{padding:8px 10px;border-radius:8px;border:0}
-.modal-desc{max-width:90vw;text-align:center}
 
 /* Efeito Flash Box */
 @keyframes flashBox{
