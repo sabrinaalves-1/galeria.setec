@@ -26,7 +26,7 @@ const minScale = 0.3;
 let items = JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
 render();
 
-// Eventos principais
+// --- Eventos principais ---
 btnAdd.addEventListener('click', ()=>fileInput.click());
 btnCamera.addEventListener('click', ()=>{
   fileInput.setAttribute('capture','environment');
@@ -42,7 +42,7 @@ btnClearAll.addEventListener('click', ()=>{
 });
 
 fileInput.addEventListener('change', async (ev)=>{
-  for(const f of Array.from(ev.target.files||[])) await addFile(f);
+  for(const f of Array.from(ev.target.files||[])) await uploadFileToServer(f);
   fileInput.value='';
 });
 
@@ -50,25 +50,15 @@ fileInput.addEventListener('change', async (ev)=>{
 ['dragenter','dragover'].forEach(ev=>dropzone.addEventListener(ev,e=>{ e.preventDefault(); dropzone.classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,e=>{ e.preventDefault(); dropzone.classList.remove('drag'); }));
 dropzone.addEventListener('drop', async (e)=>{
-  for(const f of Array.from(e.dataTransfer.files||[])) await addFile(f);
+  for(const f of Array.from(e.dataTransfer.files||[])) await uploadFileToServer(f);
 });
 dropzone.addEventListener('click', ()=>fileInput.click());
 
 // Modal
 modalBackdrop.addEventListener('click', closeModalFn);
 closeModalBtn.addEventListener('click', closeModalFn);
-zoomIn?.addEventListener('click', ()=>{
-  if(currentScale < maxScale){
-    currentScale += 0.2;
-    updateZoom();
-  }
-});
-zoomOut?.addEventListener('click', ()=>{
-  if(currentScale > minScale){
-    currentScale -= 0.2;
-    updateZoom();
-  }
-});
+zoomIn?.addEventListener('click', ()=>{ if(currentScale < maxScale){ currentScale += 0.2; updateZoom(); } });
+zoomOut?.addEventListener('click', ()=>{ if(currentScale > minScale){ currentScale -= 0.2; updateZoom(); } });
 window.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closeModalFn(); });
 
 function openModal(item){
@@ -80,18 +70,34 @@ function openModal(item){
 function closeModalFn(){ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true'); }
 function updateZoom(){ modalImg.style.transform=`scale(${currentScale})`; }
 
-// Storage
+// --- Storage ---
 function save(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(items)); }
 
-// Adicionar arquivos
-async function addFile(file){
+// --- Upload para Node.js ---
+async function uploadFileToServer(file){
   if(!file.type.startsWith('image/')) return;
-  const dataUrl = await fileToDataURL(file);
-  const watermarked = await applyWatermark(dataUrl);
   const dia = prompt('Qual o dia da imagem? (1,2 ou 3)', '1');
-  const item = { id: randomId(), dataUrl: watermarked, desc:file.name, dia:Math.min(3,Math.max(1,parseInt(dia)||1)), createdAt: Date.now() };
-  items.unshift(item); save(); render();
+  const form = new FormData();
+  form.append('image', file);
+  form.append('dia', dia);
+
+  try{
+    const res = await fetch('http://localhost:3000/upload', { method:'POST', body: form });
+    const data = await res.json();
+    const item = {
+      id: randomId(),
+      dataUrl: 'http://localhost:3000'+data.url, 
+      desc: file.name,
+      dia: Math.min(3, Math.max(1, parseInt(dia)||1)),
+      createdAt: Date.now()
+    };
+    items.unshift(item);
+    save();
+    render();
+  }catch(e){ alert('Erro no upload: '+e.message); }
 }
+
+// --- Adicionar por URL ---
 async function addImageFromUrl(url){
   const res = await fetch(url); if(!res.ok) throw new Error('Falha no download');
   const blob = await res.blob(); if(!blob.type.startsWith('image/')) throw new Error('Não é uma imagem');
@@ -102,7 +108,7 @@ async function addImageFromUrl(url){
   save(); render();
 }
 
-// Helpers
+// --- Helpers ---
 function fileToDataURL(file){return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });}
 function blobToDataURL(blob){return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(blob); });}
 function randomId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
@@ -123,7 +129,7 @@ function applyWatermark(dataUrl){
   });
 }
 
-// Render
+// --- Render ---
 function render(){
   galleries.forEach(g=>g.innerHTML='');
   if(items.length===0){ galleries.forEach(g=>g.innerHTML='<p>Nenhuma imagem</p>'); return; }
