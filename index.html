@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Galeria de Fotos • Barbosa</title>
+  <title>Galeria de Fotos</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
   <main class="container">
     <aside class="sidebar">
       <h2>Instruções</h2>
-      <p>Use o botão <strong>Camera</strong> para abrir a câmera ou arraste imagens para a área principal.</p>
+      <p>Use o botão <strong>Camera</strong> para abrir a câmera. Ou arraste imagens para a área principal.</p>
       <p>Ao adicionar via URL, o site fará o download da imagem, aplicará a marca d'água e salvará localmente.</p>
     </aside>
 
@@ -34,6 +34,28 @@
       <div id="gallery2" class="gallery"></div>
 
       <h3>📅 Dia 3</h3>
+      <div id="gallery3" class="gallery"></div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-content">
+      <img id="modalImg" alt="Pré-visualização">
+      <div class="modal-controls">
+        <button id="zoomIn">+</button>
+        <button id="zoomOut">-</button>
+        <button id="closeModal">Fechar</button>
+      </div>
+      <p id="modalDesc" class="modal-desc"></p>
+    </div>
+  </div>
+
+  <input id="fileInput" type="file" accept="image/*" multiple capture="environment" style="display:none">
+  <script src="script.js" defer></script>
+</body>
+</html>
       <div id="gallery3" class="gallery"></div>
     </section>
   </main>
