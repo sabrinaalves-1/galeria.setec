@@ -1,4 +1,4 @@
-// Adiciona uma imagem via link
+// Função para adicionar uma foto à galeria
 function addPhoto() {
   const urlInput = document.getElementById('photoURL');
   const url = urlInput.value.trim();
@@ -8,41 +8,44 @@ function addPhoto() {
     return;
   }
 
-  // Validação básica de extensão de imagem
-  const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i);
-  if (!isImage) {
-    alert("O link precisa ser de uma imagem válida (jpg, png, gif...).");
+  // Testar se é uma URL de imagem válida (termina com jpg, png, gif, jpeg, ou url contendo "drive-storage" por exemplo)
+  const isValidImage = /\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(url) || url.includes("drive-storage");
+
+  if (!isValidImage) {
+    alert("Por favor, insira um link válido de imagem.");
     return;
   }
 
-  // Testa se a imagem carrega antes de adicionar
-  const testImg = new Image();
-  testImg.onload = () => {
-    let photos = JSON.parse(localStorage.getItem('photos')) || [];
-    photos.push(url);
-    localStorage.setItem('photos', JSON.stringify(photos));
-    displayGallery();
-    urlInput.value = '';
-  };
-  testImg.onerror = () => {
-    alert("Não foi possível carregar a imagem. Verifique o link.");
-  };
-  testImg.src = url;
+  // Salvar a nova URL no localStorage
+  let photos = JSON.parse(localStorage.getItem('photos')) || [];
+  photos.push(url);
+  localStorage.setItem('photos', JSON.stringify(photos));
+
+  // Atualizar a galeria
+  displayGallery();
+
+  // Limpar o campo de entrada
+  urlInput.value = '';
 }
 
-// Remove uma imagem da galeria
+// Função para remover uma imagem
 function removePhoto(url) {
   let photos = JSON.parse(localStorage.getItem('photos')) || [];
-  photos = photos.filter(photo => photo !== url);
+  photos = photos.filter(photo => photo !== url); // Remove a URL da lista
+
+  // Atualizar o localStorage
   localStorage.setItem('photos', JSON.stringify(photos));
+
+  // Atualizar a galeria
   displayGallery();
 }
 
-// Exibe todas as imagens da galeria
+// Função para exibir as fotos da galeria
 function displayGallery() {
   const gallery = document.getElementById('gallery');
-  gallery.innerHTML = '';
+  gallery.innerHTML = ''; // Limpa a galeria antes de repopular
 
+  // Recuperar as fotos do localStorage
   const photos = JSON.parse(localStorage.getItem('photos')) || [];
 
   photos.forEach(url => {
@@ -53,10 +56,9 @@ function displayGallery() {
     img.src = url;
     img.alt = 'Foto da galeria';
     img.crossOrigin = 'anonymous';
-    img.addEventListener('click', () => openModal(url));
 
-    const description = document.createElement('p');
-    description.innerText = 'Descrição da foto';
+    // Clique para ampliar
+    img.addEventListener('click', () => openModal(url));
 
     const watermark = document.createElement('div');
     watermark.className = 'watermark';
@@ -67,16 +69,18 @@ function displayGallery() {
     removeBtn.innerText = 'Remover';
     removeBtn.onclick = () => removePhoto(url);
 
+    const description = document.createElement('p');
+    description.innerText = 'Descrição da foto'; // Você pode adaptar para ter descrição real
+
     container.appendChild(img);
     container.appendChild(description);
     container.appendChild(watermark);
     container.appendChild(removeBtn);
-
     gallery.appendChild(container);
   });
 }
 
-// Cria o modal de visualização
+// Função para abrir a imagem no modal
 const modal = document.createElement('div');
 modal.className = 'modal';
 modal.addEventListener('click', () => modal.style.display = 'none');
@@ -85,32 +89,74 @@ const modalImg = document.createElement('img');
 modal.appendChild(modalImg);
 document.body.appendChild(modal);
 
-// Abre o modal com a imagem
 function openModal(url) {
   modalImg.src = url;
   modal.style.display = 'flex';
 }
 
-// Lida com imagem tirada da câmera ou galeria
-function handleCameraPhoto(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+// Função para abrir a câmera (para capturar foto)
+function openCamera() {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+        video.style.position = 'fixed';
+        video.style.top = '50%';
+        video.style.left = '50%';
+        video.style.transform = 'translate(-50%, -50%)';
+        video.style.zIndex = '1000';
+        video.style.width = '300px';
+        video.style.borderRadius = '10px';
+        document.body.appendChild(video);
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const base64Image = e.target.result;
+        // Botão para capturar foto
+        const captureBtn = document.createElement('button');
+        captureBtn.innerText = 'Capturar Foto';
+        captureBtn.style.position = 'fixed';
+        captureBtn.style.top = 'calc(50% + 180px)';
+        captureBtn.style.left = '50%';
+        captureBtn.style.transform = 'translateX(-50%)';
+        captureBtn.style.zIndex = '1000';
+        captureBtn.style.padding = '10px 20px';
+        captureBtn.style.backgroundColor = '#5b33ab';
+        captureBtn.style.color = '#fff';
+        captureBtn.style.border = 'none';
+        captureBtn.style.borderRadius = '5px';
+        captureBtn.style.cursor = 'pointer';
+        document.body.appendChild(captureBtn);
 
-    let photos = JSON.parse(localStorage.getItem('photos')) || [];
-    photos.push(base64Image);
-    localStorage.setItem('photos', JSON.stringify(photos));
-    displayGallery();
-  };
+        captureBtn.onclick = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataURL = canvas.toDataURL('image/png');
 
-  reader.readAsDataURL(file);
+          // Salvar no localStorage e atualizar galeria
+          let photos = JSON.parse(localStorage.getItem('photos')) || [];
+          photos.push(dataURL);
+          localStorage.setItem('photos', JSON.stringify(photos));
+          displayGallery();
+
+          // Parar vídeo e remover elementos
+          stream.getTracks().forEach(track => track.stop());
+          video.remove();
+          captureBtn.remove();
+        };
+      })
+      .catch(function(error) {
+        alert("Não foi possível acessar a câmera.");
+      });
+  } else {
+    alert("Câmera não suportada neste navegador.");
+  }
 }
 
 // Inicializa a galeria ao carregar a página
-window.onload = function () {
+window.onload = function() {
   displayGallery();
 };
 
