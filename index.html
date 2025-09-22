@@ -1,41 +1,58 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Minha Galeria de Fotos</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galeria de Fotos</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<header class="topbar">
+<div class="brand">Galeria • Barbosa</div>
+<nav class="menu">
+<button id="btnAdd">Adicionar</button>
+<button id="btnCamera">Camera</button>
+<button id="btnFromUrl">Adicionar por URL</button>
+<button id="btnClearAll">Limpar tudo</button>
+</nav>
+</header>
 
-  <!-- Menu -->
-  <header>
-    <div class="menu">
-      <button onclick="openCamera()">📸 Abrir Câmera</button>
-      <h1>Minha Galeria de Fotos</h1>
-    </div>
-  </header>
 
-  <!-- Seção de Adicionar Foto -->
-  <main>
-    <section class="add-photo">
-      <input type="text" id="photoURL" placeholder="Cole o link da imagem aqui" />
-      <button onclick="addPhoto()">Adicionar Foto</button>
-    </section>
+<main class="container">
+<aside class="sidebar">
+<h2>Instruções</h2>
+<p>Use o botão <strong>Camera</strong> para abrir a câmera (mobile/desktop que suportar). Ou arraste imagens para a área principal.</p>
+<p>Ao adicionar via URL, o site fará o download da imagem, aplicará a marca d'água e salvará localmente.</p>
+</aside>
 
-    <!-- Galeria -->
-    <section class="gallery" id="gallery">
-      <!-- Fotos adicionadas vão aqui -->
-    </section>
-  </main>
 
-  <!-- Rodapé -->
-  <footer>
-    <div class="footer-content">
-      <p>© 2025 Minha Galeria - Todos os direitos reservados</p>
-    </div>
-  </footer>
+<section class="gallery-area">
+<div id="dropzone" class="dropzone">Arraste imagens aqui ou clique em "Adicionar"</div>
+<div id="gallery" class="gallery"></div>
+</section>
+</main>
 
-  <script src="script.js"></script>
+
+<!-- Modal de visualização -->
+<div id="modal" class="modal hidden" aria-hidden="true">
+<div class="modal-backdrop" id="modalBackdrop"></div>
+<div class="modal-content">
+<img id="modalImg" alt="Pré-visualização">
+<div class="modal-controls">
+<button id="zoomIn">+</button>
+<button id="zoomOut">-</button>
+<button id="closeModal">Fechar</button>
+</div>
+<p id="modalDesc" class="modal-desc"></p>
+</div>
+</div>
+
+
+<!-- Inputs invisíveis -->
+<input id="fileInput" type="file" accept="image/*" multiple capture="environment" style="display:none">
+<input id="urlInput" type="url" placeholder="https://..." style="display:none">
+
+
+<script src="app.js"></script>
 </body>
 </html>
