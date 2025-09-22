@@ -8,25 +8,19 @@
 </head>
 <body>
   <h2>Galeria • Barbosa</h2>
-  <button id="addBtn">Adicionar</button>
-  <button id="cameraBtn">Camera</button>
-  <button id="urlBtn">Adicionar por URL</button>
-  <button id="clearBtn">Limpar tudo</button>
 
-  <h3>Instruções</h3>
-  <p>
-    Use o botão <b>Camera</b> para abrir a câmera (mobile/desktop que suportar).  
-    Ou arraste imagens para a área principal.  
-  </p>
-  <p>
-    Ao adicionar via URL, o site fará o download da imagem, aplicará a marca d'água e salvará localmente.
-  </p>
-  <p>Escolha o <b>dia</b> antes de enviar:</p>
-  <select id="daySelect">
-    <option value="1">Dia 1</option>
-    <option value="2">Dia 2</option>
-    <option value="3">Dia 3</option>
-  </select>
+  <div class="controls">
+    <button id="addBtn">Adicionar</button>
+    <button id="cameraBtn">Camera</button>
+    <button id="urlBtn">Adicionar por URL</button>
+    <button id="clearBtn">Limpar tudo</button>
+
+    <select id="daySelect">
+      <option value="1">Dia 1</option>
+      <option value="2">Dia 2</option>
+      <option value="3">Dia 3</option>
+    </select>
+  </div>
 
   <h3>📅 Dia 1</h3>
   <div id="gallery1" class="gallery"></div>
@@ -47,3 +41,4 @@
   <script src="script.js" defer></script>
 </body>
 </html>
+
