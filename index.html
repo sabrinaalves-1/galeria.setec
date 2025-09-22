@@ -11,7 +11,7 @@
     <div class="brand">Galeria • Barbosa</div>
     <nav class="menu">
       <button id="btnAdd">Adicionar</button>
-      <button id="btnCamera">Camera</button>
+      <button id="btnCamera">Câmera</button>
       <button id="btnFromUrl">Adicionar por URL</button>
       <button id="btnClearAll">Limpar tudo</button>
     </nav>
@@ -20,12 +20,15 @@
   <main class="container">
     <aside class="sidebar">
       <h2>Instruções</h2>
-      <p>Use o botão <strong>Camera</strong> para abrir a câmera. Ou arraste imagens para a área principal.</p>
+      <p>Use o botão <strong>Câmera</strong> para abrir a câmera e tirar fotos.</p>
+      <p>Ou arraste imagens para a área principal.</p>
       <p>Ao adicionar via URL, o site fará o download da imagem, aplicará a marca d'água e salvará localmente.</p>
     </aside>
 
     <section class="gallery-area">
-      <div id="dropzone" class="dropzone">Arraste imagens aqui ou clique em "Adicionar"</div>
+      <div id="dropzone" class="dropzone">
+        Arraste imagens aqui ou use os botões acima
+      </div>
 
       <h3>📅 Dia 1</h3>
       <div id="gallery1" class="gallery"></div>
@@ -52,7 +55,10 @@
     </div>
   </div>
 
-  <input id="fileInput" type="file" accept="image/*" multiple capture="environment" style="display:none">
+  <!-- Input de arquivos -->
+  <input id="fileInput" type="file" accept="image/*" multiple style="display:none">
+  <input id="cameraInput" type="file" accept="image/*" capture="environment" style="display:none">
+
   <script src="script.js" defer></script>
 </body>
 </html>
