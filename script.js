@@ -1,5 +1,9 @@
 const STORAGE_KEY = 'galeriaFotos_v3';
-const galleries = [document.getElementById('gallery1'), document.getElementById('gallery2'), document.getElementById('gallery3')];
+const galleries = [
+  document.getElementById('gallery1'),
+  document.getElementById('gallery2'),
+  document.getElementById('gallery3')
+];
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
 const btnAdd = document.getElementById('btnAdd');
@@ -14,7 +18,10 @@ const modalBackdrop = document.getElementById('modalBackdrop');
 const closeModalBtn = document.getElementById('closeModal');
 const zoomIn = document.getElementById('zoomIn');
 const zoomOut = document.getElementById('zoomOut');
+
 let currentScale = 1;
+const maxScale = 3;
+const minScale = 0.3;
 
 let items = JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
 render();
@@ -49,17 +56,29 @@ dropzone.addEventListener('click', ()=>fileInput.click());
 
 // Modal
 modalBackdrop.addEventListener('click', closeModalFn);
-zoomIn?.addEventListener('click', ()=>{ currentScale=Math.min(3,currentScale+0.2); modalImg.style.transform=`scale(${currentScale})`; });
-zoomOut?.addEventListener('click', ()=>{ currentScale=Math.max(0.3,currentScale-0.2); modalImg.style.transform=`scale(${currentScale})`; });
+closeModalBtn.addEventListener('click', closeModalFn);
+zoomIn?.addEventListener('click', ()=>{
+  if(currentScale < maxScale){
+    currentScale += 0.2;
+    updateZoom();
+  }
+});
+zoomOut?.addEventListener('click', ()=>{
+  if(currentScale > minScale){
+    currentScale -= 0.2;
+    updateZoom();
+  }
+});
 window.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closeModalFn(); });
 
 function openModal(item){
   modalImg.src=item.dataUrl;
   modalDesc.textContent=item.desc||('Adicionada em '+new Date(item.createdAt).toLocaleString());
-  currentScale=1; modalImg.style.transform='scale(1)';
+  currentScale=1; updateZoom();
   modal.classList.remove('hidden'); modal.setAttribute('aria-hidden','false');
 }
 function closeModalFn(){ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true'); }
+function updateZoom(){ modalImg.style.transform=`scale(${currentScale})`; }
 
 // Storage
 function save(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(items)); }
@@ -110,9 +129,27 @@ function render(){
   if(items.length===0){ galleries.forEach(g=>g.innerHTML='<p>Nenhuma imagem</p>'); return; }
   for(const item of items){
     const card=document.createElement('article'); card.className='card';
-    const img=document.createElement('img'); img.src=item.dataUrl; img.alt=item.desc||''; img.addEventListener('click',()=>openModal(item));
-    const desc=document.createElement('div'); desc.className='desc'; desc.textContent=item.desc||'';
-    card.appendChild(img); card.appendChild(desc);
+    const removeBtn=document.createElement('button');
+    removeBtn.className='remove-btn';
+    removeBtn.textContent='×';
+    removeBtn.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      items=items.filter(i=>i.id!==item.id);
+      save(); render();
+    });
+
+    const img=document.createElement('img');
+    img.src=item.dataUrl;
+    img.alt=item.desc||'';
+    img.addEventListener('click',()=>openModal(item));
+
+    const desc=document.createElement('div');
+    desc.className='desc';
+    desc.textContent=item.desc||'';
+
+    card.appendChild(removeBtn);
+    card.appendChild(img);
+    card.appendChild(desc);
     galleries[item.dia-1].appendChild(card);
   }
 }
