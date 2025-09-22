@@ -3,7 +3,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #fff; /* Fundo branco */
+  background-color: #c5b6e3; /* Cor de fundo #c5b6e3 */
   color: #333;
 }
 
@@ -53,7 +53,7 @@ header {
 
 .add-photo button {
   padding: 10px 20px;
-  background: #6C63FF;
+  background: #5b33ab; /* Cor do botão "Adicionar Foto" #5b33ab */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -147,3 +147,4 @@ footer {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
+
