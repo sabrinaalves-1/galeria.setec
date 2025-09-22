@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'galeriaFotos_v2';
+const STORAGE_KEY = 'galeriaFotos_v3';
 const galleries = [document.getElementById('gallery1'), document.getElementById('gallery2'), document.getElementById('gallery3')];
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
@@ -19,7 +19,7 @@ let currentScale = 1;
 let items = JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
 render();
 
-// Eventos
+// Eventos principais
 btnAdd.addEventListener('click', ()=>fileInput.click());
 btnCamera.addEventListener('click', ()=>{
   fileInput.setAttribute('capture','environment');
@@ -39,6 +39,7 @@ fileInput.addEventListener('change', async (ev)=>{
   fileInput.value='';
 });
 
+// Drag & Drop
 ['dragenter','dragover'].forEach(ev=>dropzone.addEventListener(ev,e=>{ e.preventDefault(); dropzone.classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,e=>{ e.preventDefault(); dropzone.classList.remove('drag'); }));
 dropzone.addEventListener('drop', async (e)=>{
@@ -68,7 +69,7 @@ async function addFile(file){
   if(!file.type.startsWith('image/')) return;
   const dataUrl = await fileToDataURL(file);
   const watermarked = await applyWatermark(dataUrl);
-  const dia = prompt('Qual o dia da imagem? (1, 2 ou 3)', '1');
+  const dia = prompt('Qual o dia da imagem? (1,2 ou 3)', '1');
   const item = { id: randomId(), dataUrl: watermarked, desc:file.name, dia:Math.min(3,Math.max(1,parseInt(dia)||1)), createdAt: Date.now() };
   items.unshift(item); save(); render();
 }
@@ -77,7 +78,7 @@ async function addImageFromUrl(url){
   const blob = await res.blob(); if(!blob.type.startsWith('image/')) throw new Error('Não é uma imagem');
   const dataUrl = await blobToDataURL(blob);
   const watermarked = await applyWatermark(dataUrl);
-  const dia = prompt('Qual o dia da imagem? (1, 2 ou 3)', '1');
+  const dia = prompt('Qual o dia da imagem? (1,2 ou 3)', '1');
   items.unshift({ id: randomId(), dataUrl: watermarked, desc:url, dia:Math.min(3,Math.max(1,parseInt(dia)||1)), createdAt: Date.now() });
   save(); render();
 }
