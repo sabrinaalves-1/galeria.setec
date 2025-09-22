@@ -1,161 +1,170 @@
-// Função para adicionar uma foto à galeria
-function addPhoto() {
-  const urlInput = document.getElementById('photoURL');
-  const url = urlInput.value.trim();
+const STORAGE_KEY = 'galeriaFotos_v1';
+const galleryEl = document.getElementById('gallery');
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const btnAdd = document.getElementById('btnAdd');
+const btnCamera = document.getElementById('btnCamera');
+const btnFromUrl = document.getElementById('btnFromUrl');
+const btnClearAll = document.getElementById('btnClearAll');
+const modal = document.getElementById('modal');
+const modalImg = document.getElementById('modalImg');
+const modalDesc = document.getElementById('modalDesc');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const closeModal = document.getElementById('closeModal');
+const zoomIn = document.getElementById('zoomIn');
+const zoomOut = document.getElementById('zoomOut');
+let currentScale = 1;
 
-  if (!url) {
-    alert("Insira um link válido da imagem.");
-    return;
-  }
+let items = load();
+render();
 
-  // Testar se é uma URL de imagem válida (termina com jpg, png, gif, jpeg, ou url contendo "drive-storage" por exemplo)
-  const isValidImage = /\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(url) || url.includes("drive-storage");
+btnAdd.addEventListener('click', ()=> fileInput.click());
+btnCamera.addEventListener('click', ()=>{
+  fileInput.setAttribute('capture','environment');
+  fileInput.click();
+});
+btnFromUrl.addEventListener('click', async ()=>{
+  const url = prompt('Cole a URL da imagem:');
+  if(!url) return;
+  try{
+    const added = await addImageFromUrl(url);
+    if(added) alert('Imagem adicionada!');
+  }catch(e){ alert('Erro: '+e.message); }
+});
+btnClearAll.addEventListener('click', ()=>{
+  if(confirm('Remover todas as imagens?')){ items = []; save(); render(); }
+});
 
-  if (!isValidImage) {
-    alert("Por favor, insira um link válido de imagem.");
-    return;
-  }
+fileInput.addEventListener('change', async (ev)=>{
+  const files = Array.from(ev.target.files||[]);
+  for(const f of files){ await addFile(f); }
+  fileInput.value='';
+});
 
-  // Salvar a nova URL no localStorage
-  let photos = JSON.parse(localStorage.getItem('photos')) || [];
-  photos.push(url);
-  localStorage.setItem('photos', JSON.stringify(photos));
+['dragenter','dragover'].forEach(ev=>
+  dropzone.addEventListener(ev, e=>{e.preventDefault();dropzone.classList.add('drag')} )
+);
+['dragleave','drop'].forEach(ev=>
+  dropzone.addEventListener(ev,e=>{e.preventDefault();dropzone.classList.remove('drag')} )
+);
+dropzone.addEventListener('drop', async (e)=>{
+  const dt = e.dataTransfer; if(!dt) return;
+  const files = Array.from(dt.files||[]);
+  for(const f of files) await addFile(f);
+});
+dropzone.addEventListener('click', ()=> fileInput.click());
 
-  // Atualizar a galeria
-  displayGallery();
+modalBackdrop.addEventListener('click', closeModalFn);
+closeModal.addEventListener('click', closeModalFn);
+zoomIn.addEventListener('click', ()=>{
+  currentScale = Math.min(3, currentScale+0.2);
+  modalImg.style.transform = `scale(${currentScale})`;
+});
+zoomOut.addEventListener('click', ()=>{
+  currentScale = Math.max(0.3, currentScale-0.2);
+  modalImg.style.transform = `scale(${currentScale})`;
+});
 
-  // Limpar o campo de entrada
-  urlInput.value = '';
+function openModal(item){
+  modalImg.src = item.dataUrl;
+  modalDesc.textContent = item.desc || ('Adicionada em '+ new Date(item.createdAt).toLocaleString());
+  currentScale = 1; modalImg.style.transform='scale(1)';
+  modal.classList.remove('hidden'); modal.setAttribute('aria-hidden','false');
+}
+function closeModalFn(){ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true'); }
+
+function load(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] }
+  catch(e){ return [] }
+}
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+
+async function addFile(file){
+  if(!file.type.startsWith('image/')) return;
+  const dataUrl = await fileToDataURL(file);
+  const watermarked = await applyWatermark(dataUrl);
+  const item = {id: randomId(), dataUrl: watermarked, desc: file.name, createdAt: Date.now()};
+  items.unshift(item); save(); render();
 }
 
-// Função para remover uma imagem
-function removePhoto(url) {
-  let photos = JSON.parse(localStorage.getItem('photos')) || [];
-  photos = photos.filter(photo => photo !== url); // Remove a URL da lista
-
-  // Atualizar o localStorage
-  localStorage.setItem('photos', JSON.stringify(photos));
-
-  // Atualizar a galeria
-  displayGallery();
+async function addImageFromUrl(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Falha no download');
+  const blob = await res.blob();
+  if(!blob.type.startsWith('image/')) throw new Error('Não é uma imagem');
+  const dataUrl = await blobToDataURL(blob);
+  const watermarked = await applyWatermark(dataUrl);
+  const item = {id: randomId(), dataUrl: watermarked, desc: url, createdAt: Date.now()};
+  items.unshift(item); save(); render();
+  return true;
 }
 
-// Função para exibir as fotos da galeria
-function displayGallery() {
-  const gallery = document.getElementById('gallery');
-  gallery.innerHTML = ''; // Limpa a galeria antes de repopular
-
-  // Recuperar as fotos do localStorage
-  const photos = JSON.parse(localStorage.getItem('photos')) || [];
-
-  photos.forEach(url => {
-    const container = document.createElement('div');
-    container.className = 'photo-container';
-
-    const img = document.createElement('img');
-    img.src = url;
-    img.alt = 'Foto da galeria';
-    img.crossOrigin = 'anonymous';
-
-    // Clique para ampliar
-    img.addEventListener('click', () => openModal(url));
-
-    const watermark = document.createElement('div');
-    watermark.className = 'watermark';
-    watermark.innerText = '© MinhaGaleria';
-
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'remove-btn';
-    removeBtn.innerText = 'Remover';
-    removeBtn.onclick = () => removePhoto(url);
-
-    const description = document.createElement('p');
-    description.innerText = 'Descrição da foto'; // Você pode adaptar para ter descrição real
-
-    container.appendChild(img);
-    container.appendChild(description);
-    container.appendChild(watermark);
-    container.appendChild(removeBtn);
-    gallery.appendChild(container);
+function fileToDataURL(file){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = ()=>res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+function blobToDataURL(blob){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = ()=>res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(blob);
   });
 }
 
-// Função para abrir a imagem no modal
-const modal = document.createElement('div');
-modal.className = 'modal';
-modal.addEventListener('click', () => modal.style.display = 'none');
-
-const modalImg = document.createElement('img');
-modal.appendChild(modalImg);
-document.body.appendChild(modal);
-
-function openModal(url) {
-  modalImg.src = url;
-  modal.style.display = 'flex';
+function applyWatermark(dataUrl){
+  return new Promise((res)=>{
+    const img = new Image(); img.crossOrigin='anonymous';
+    img.onload = ()=>{
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      ctx.fillRect(20, img.height-60, img.width-40, 50);
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.font = Math.round(Math.max(12, img.width*0.02)) + 'px sans-serif';
+      ctx.fillText('Galeria • Barbosa', 30, img.height-30);
+      res(canvas.toDataURL('image/jpeg',0.9));
+    };
+    img.onerror = ()=>res(dataUrl);
+    img.src = dataUrl;
+  });
 }
 
-// Função para abrir a câmera (para capturar foto)
-function openCamera() {
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(function(stream) {
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        video.play();
-        video.style.position = 'fixed';
-        video.style.top = '50%';
-        video.style.left = '50%';
-        video.style.transform = 'translate(-50%, -50%)';
-        video.style.zIndex = '1000';
-        video.style.width = '300px';
-        video.style.borderRadius = '10px';
-        document.body.appendChild(video);
+function randomId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
 
-        // Botão para capturar foto
-        const captureBtn = document.createElement('button');
-        captureBtn.innerText = 'Capturar Foto';
-        captureBtn.style.position = 'fixed';
-        captureBtn.style.top = 'calc(50% + 180px)';
-        captureBtn.style.left = '50%';
-        captureBtn.style.transform = 'translateX(-50%)';
-        captureBtn.style.zIndex = '1000';
-        captureBtn.style.padding = '10px 20px';
-        captureBtn.style.backgroundColor = '#5b33ab';
-        captureBtn.style.color = '#fff';
-        captureBtn.style.border = 'none';
-        captureBtn.style.borderRadius = '5px';
-        captureBtn.style.cursor = 'pointer';
-        document.body.appendChild(captureBtn);
-
-        captureBtn.onclick = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const dataURL = canvas.toDataURL('image/png');
-
-          // Salvar no localStorage e atualizar galeria
-          let photos = JSON.parse(localStorage.getItem('photos')) || [];
-          photos.push(dataURL);
-          localStorage.setItem('photos', JSON.stringify(photos));
-          displayGallery();
-
-          // Parar vídeo e remover elementos
-          stream.getTracks().forEach(track => track.stop());
-          video.remove();
-          captureBtn.remove();
-        };
-      })
-      .catch(function(error) {
-        alert("Não foi possível acessar a câmera.");
-      });
-  } else {
-    alert("Câmera não suportada neste navegador.");
+function render(){
+  galleryEl.innerHTML='';
+  if(items.length===0){ galleryEl.innerHTML='<p>Nenhuma imagem</p>'; return }
+  for(const item of items){
+    const card = document.createElement('article'); card.className='card';
+    const img = document.createElement('img'); img.src=item.dataUrl; img.alt=item.desc||'';
+    img.addEventListener('click', ()=>openModal(item));
+    const desc = document.createElement('div'); desc.className='desc'; desc.textContent=item.desc||'';
+    const actions = document.createElement('div'); actions.className='actions';
+    const btnDownload = document.createElement('button'); btnDownload.textContent='⬇';
+    btnDownload.addEventListener('click', ()=>downloadDataUrl(item.dataUrl, (item.desc||'imagem')+'.jpg'));
+    const btnRemove = document.createElement('button'); btnRemove.textContent='✖';
+    btnRemove.addEventListener('click', ()=>{
+      if(confirm('Remover esta imagem?')){
+        items = items.filter(i=>i.id!==item.id); save(); render();
+      }
+    });
+    actions.appendChild(btnDownload); actions.appendChild(btnRemove);
+    card.appendChild(img); card.appendChild(actions); card.appendChild(desc);
+    galleryEl.appendChild(card);
   }
 }
 
-// Inicializa a galeria ao carregar a página
-window.onload = function() {
-  displayGallery();
-};
+function downloadDataUrl(dataUrl, filename){
+  const a = document.createElement('a');
+  a.href=dataUrl; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+window.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closeModalFn(); });
