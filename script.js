@@ -1,5 +1,7 @@
 const STORAGE_KEY = 'galeriaFotos_v1';
-const galleryEl = document.getElementById('gallery');
+const gallery1El = document.getElementById('gallery1');
+const gallery2El = document.getElementById('gallery2');
+const gallery3El = document.getElementById('gallery3');
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
 const btnAdd = document.getElementById('btnAdd');
@@ -13,11 +15,13 @@ const modalBackdrop = document.getElementById('modalBackdrop');
 const closeModal = document.getElementById('closeModal');
 const zoomIn = document.getElementById('zoomIn');
 const zoomOut = document.getElementById('zoomOut');
+const daySelect = document.getElementById('daySelect');
 let currentScale = 1;
 
 let items = load();
 render();
 
+// Eventos principais
 btnAdd.addEventListener('click', ()=> fileInput.click());
 btnCamera.addEventListener('click', ()=>{
   fileInput.setAttribute('capture','environment');
@@ -41,6 +45,7 @@ fileInput.addEventListener('change', async (ev)=>{
   fileInput.value='';
 });
 
+// Drag & Drop
 ['dragenter','dragover'].forEach(ev=>
   dropzone.addEventListener(ev, e=>{e.preventDefault();dropzone.classList.add('drag')} )
 );
@@ -54,6 +59,7 @@ dropzone.addEventListener('drop', async (e)=>{
 });
 dropzone.addEventListener('click', ()=> fileInput.click());
 
+// Modal
 modalBackdrop.addEventListener('click', closeModalFn);
 closeModal.addEventListener('click', closeModalFn);
 zoomIn.addEventListener('click', ()=>{
@@ -64,6 +70,7 @@ zoomOut.addEventListener('click', ()=>{
   currentScale = Math.max(0.3, currentScale-0.2);
   modalImg.style.transform = `scale(${currentScale})`;
 });
+window.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closeModalFn(); });
 
 function openModal(item){
   modalImg.src = item.dataUrl;
@@ -73,20 +80,24 @@ function openModal(item){
 }
 function closeModalFn(){ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true'); }
 
-function load(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] }
-  catch(e){ return [] }
-}
+// Storage
+function load(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] } catch(e){ return [] } }
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
 
+// Adicionar arquivos
 async function addFile(file){
   if(!file.type.startsWith('image/')) return;
   const dataUrl = await fileToDataURL(file);
   const watermarked = await applyWatermark(dataUrl);
-  const item = {id: randomId(), dataUrl: watermarked, desc: file.name, createdAt: Date.now()};
+  const item = {
+    id: randomId(),
+    dataUrl: watermarked,
+    desc: file.name,
+    createdAt: Date.now(),
+    dia: daySelect.value
+  };
   items.unshift(item); save(); render();
 }
-
 async function addImageFromUrl(url){
   const res = await fetch(url);
   if(!res.ok) throw new Error('Falha no download');
@@ -94,11 +105,18 @@ async function addImageFromUrl(url){
   if(!blob.type.startsWith('image/')) throw new Error('Não é uma imagem');
   const dataUrl = await blobToDataURL(blob);
   const watermarked = await applyWatermark(dataUrl);
-  const item = {id: randomId(), dataUrl: watermarked, desc: url, createdAt: Date.now()};
+  const item = {
+    id: randomId(),
+    dataUrl: watermarked,
+    desc: url,
+    createdAt: Date.now(),
+    dia: daySelect.value
+  };
   items.unshift(item); save(); render();
   return true;
 }
 
+// Helpers
 function fileToDataURL(file){
   return new Promise((res,rej)=>{
     const r = new FileReader();
@@ -115,7 +133,6 @@ function blobToDataURL(blob){
     r.readAsDataURL(blob);
   });
 }
-
 function applyWatermark(dataUrl){
   return new Promise((res)=>{
     const img = new Image(); img.crossOrigin='anonymous';
@@ -135,12 +152,21 @@ function applyWatermark(dataUrl){
     img.src = dataUrl;
   });
 }
-
 function randomId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
 
+// Renderização
 function render(){
-  galleryEl.innerHTML='';
-  if(items.length===0){ galleryEl.innerHTML='<p>Nenhuma imagem</p>'; return }
+  gallery1El.innerHTML='';
+  gallery2El.innerHTML='';
+  gallery3El.innerHTML='';
+
+  if(items.length===0){
+    gallery1El.innerHTML='<p>Nenhuma imagem</p>';
+    gallery2El.innerHTML='<p>Nenhuma imagem</p>';
+    gallery3El.innerHTML='<p>Nenhuma imagem</p>';
+    return;
+  }
+
   for(const item of items){
     const card = document.createElement('article'); card.className='card';
     const img = document.createElement('img'); img.src=item.dataUrl; img.alt=item.desc||'';
@@ -157,66 +183,15 @@ function render(){
     });
     actions.appendChild(btnDownload); actions.appendChild(btnRemove);
     card.appendChild(img); card.appendChild(actions); card.appendChild(desc);
-    galleryEl.appendChild(card);
+
+    const g = document.getElementById('gallery'+(item.dia||1));
+    g.appendChild(card);
   }
 }
 
+// Download
 function downloadDataUrl(dataUrl, filename){
   const a = document.createElement('a');
   a.href=dataUrl; a.download=filename;
   document.body.appendChild(a); a.click(); a.remove();
 }
-
-window.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closeModalFn(); });
-  const foto = { src: url, desc, dia };
-  createCard(foto);
-  saveFoto(foto);
-});
-
-// Captura da câmera
-cameraBtn.addEventListener("click", async () => {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    alert("Câmera não suportada neste dispositivo.");
-    return;
-  }
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    const video = document.createElement("video");
-    video.srcObject = stream;
-    video.play();
-
-    const capture = confirm("Aperte OK para capturar uma foto da câmera.");
-    if (capture) {
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext("2d").drawImage(video, 0, 0);
-      const dia = daySelect.value;
-      const foto = {
-        src: canvas.toDataURL("image/png"),
-        desc: "Foto da câmera",
-        dia
-      };
-      createCard(foto);
-      saveFoto(foto);
-    }
-    stream.getTracks().forEach(track => track.stop());
-  } catch (err) {
-    alert("Erro ao acessar a câmera: " + err);
-  }
-});
-
-// Limpar tudo
-clearBtn.addEventListener("click", () => {
-  if (!confirm("Tem certeza que deseja limpar todas as fotos?")) return;
-  localStorage.removeItem("fotos");
-  document.querySelectorAll(".gallery").forEach(g => g.innerHTML = "");
-});
-
-// Carregar imagens salvas
-function loadImages() {
-  let fotos = JSON.parse(localStorage.getItem("fotos")) || [];
-  fotos.forEach(f => createCard(f));
-}
-loadImages();
