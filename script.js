@@ -1,10 +1,18 @@
-// Função para adicionar uma foto à galeria a partir de URL
+// Função para adicionar uma foto à galeria
 function addPhoto() {
   const urlInput = document.getElementById('photoURL');
   const url = urlInput.value.trim();
 
   if (!url) {
     alert("Insira um link válido da imagem.");
+    return;
+  }
+
+  // Testar se é uma URL de imagem válida (termina com jpg, png, gif, jpeg, ou url contendo "drive-storage" por exemplo)
+  const isValidImage = /\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(url) || url.includes("drive-storage");
+
+  if (!isValidImage) {
+    alert("Por favor, insira um link válido de imagem.");
     return;
   }
 
@@ -20,7 +28,7 @@ function addPhoto() {
   urlInput.value = '';
 }
 
-// Função para remover uma imagem da galeria
+// Função para remover uma imagem
 function removePhoto(url) {
   let photos = JSON.parse(localStorage.getItem('photos')) || [];
   photos = photos.filter(photo => photo !== url); // Remove a URL da lista
@@ -62,7 +70,7 @@ function displayGallery() {
     removeBtn.onclick = () => removePhoto(url);
 
     const description = document.createElement('p');
-    description.innerText = 'Descrição da foto'; // Aqui você pode personalizar
+    description.innerText = 'Descrição da foto'; // Você pode adaptar para ter descrição real
 
     container.appendChild(img);
     container.appendChild(description);
@@ -91,64 +99,40 @@ function openCamera() {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(function(stream) {
-        // Criar container para vídeo e botões
-        const cameraContainer = document.createElement('div');
-        cameraContainer.style.position = 'fixed';
-        cameraContainer.style.top = '50%';
-        cameraContainer.style.left = '50%';
-        cameraContainer.style.transform = 'translate(-50%, -50%)';
-        cameraContainer.style.zIndex = '10000';
-        cameraContainer.style.backgroundColor = '#000';
-        cameraContainer.style.padding = '10px';
-        cameraContainer.style.borderRadius = '10px';
-        cameraContainer.style.textAlign = 'center';
-        cameraContainer.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-        document.body.appendChild(cameraContainer);
-
-        // Criar vídeo
         const video = document.createElement('video');
-        video.autoplay = true;
         video.srcObject = stream;
-        video.style.width = '320px';
-        video.style.borderRadius = '8px';
-        cameraContainer.appendChild(video);
+        video.play();
+        video.style.position = 'fixed';
+        video.style.top = '50%';
+        video.style.left = '50%';
+        video.style.transform = 'translate(-50%, -50%)';
+        video.style.zIndex = '1000';
+        video.style.width = '300px';
+        video.style.borderRadius = '10px';
+        document.body.appendChild(video);
 
-        // Botão capturar foto
+        // Botão para capturar foto
         const captureBtn = document.createElement('button');
         captureBtn.innerText = 'Capturar Foto';
-        captureBtn.style.marginTop = '10px';
+        captureBtn.style.position = 'fixed';
+        captureBtn.style.top = 'calc(50% + 180px)';
+        captureBtn.style.left = '50%';
+        captureBtn.style.transform = 'translateX(-50%)';
+        captureBtn.style.zIndex = '1000';
         captureBtn.style.padding = '10px 20px';
-        captureBtn.style.fontSize = '16px';
-        captureBtn.style.cursor = 'pointer';
-        captureBtn.style.borderRadius = '5px';
-        captureBtn.style.border = 'none';
         captureBtn.style.backgroundColor = '#5b33ab';
         captureBtn.style.color = '#fff';
-        cameraContainer.appendChild(captureBtn);
-
-        // Botão fechar câmera
-        const closeBtn = document.createElement('button');
-        closeBtn.innerText = 'Fechar';
-        closeBtn.style.marginTop = '10px';
-        closeBtn.style.marginLeft = '10px';
-        closeBtn.style.padding = '10px 20px';
-        closeBtn.style.fontSize = '16px';
-        closeBtn.style.cursor = 'pointer';
-        closeBtn.style.borderRadius = '5px';
-        closeBtn.style.border = 'none';
-        closeBtn.style.backgroundColor = '#FF4081';
-        closeBtn.style.color = '#fff';
-        cameraContainer.appendChild(closeBtn);
+        captureBtn.style.border = 'none';
+        captureBtn.style.borderRadius = '5px';
+        captureBtn.style.cursor = 'pointer';
+        document.body.appendChild(captureBtn);
 
         captureBtn.onclick = () => {
-          // Criar canvas para capturar frame
           const canvas = document.createElement('canvas');
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-          // Transformar em base64
           const dataURL = canvas.toDataURL('image/png');
 
           // Salvar no localStorage e atualizar galeria
@@ -157,20 +141,14 @@ function openCamera() {
           localStorage.setItem('photos', JSON.stringify(photos));
           displayGallery();
 
-          // Parar a câmera e remover container
+          // Parar vídeo e remover elementos
           stream.getTracks().forEach(track => track.stop());
-          cameraContainer.remove();
+          video.remove();
+          captureBtn.remove();
         };
-
-        closeBtn.onclick = () => {
-          // Parar a câmera e remover container
-          stream.getTracks().forEach(track => track.stop());
-          cameraContainer.remove();
-        };
-
       })
       .catch(function(error) {
-        alert("Não foi possível acessar a câmera. Verifique as permissões.");
+        alert("Não foi possível acessar a câmera.");
       });
   } else {
     alert("Câmera não suportada neste navegador.");
@@ -181,4 +159,3 @@ function openCamera() {
 window.onload = function() {
   displayGallery();
 };
-
