@@ -1,13 +1,13 @@
 body {
   font-family: Arial, sans-serif;
-  background: #121212;
+  background: #212121; /* cor de fundo mais neutra */
   color: #fff;
   margin: 0;
   padding: 0;
 }
 
 header {
-  background: #6a4fef; /* roxo claro */
+  background: #6C63FF; /* roxo claro */
   padding: 20px;
   text-align: center;
   box-shadow: 0 2px 5px rgba(0,0,0,0.5);
@@ -24,11 +24,13 @@ header {
   border-radius: 5px;
   border: none;
   margin-right: 10px;
+  background: #4F83CC; /* azul claro */
+  color: #fff;
 }
 
 .add-photo button {
   padding: 10px 20px;
-  background: #4fc3f7; /* azul claro */
+  background: #00B0FF; /* azul mais vibrante */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -59,7 +61,7 @@ header {
 
 .photo-container:hover img {
   transform: scale(1.05);
-  filter: brightness(1.2);
+  filter: brightness(1.1);
 }
 
 .watermark {
@@ -74,32 +76,11 @@ header {
   pointer-events: none;
 }
 
-/* Modal */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.9);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  display: none;
-}
-
-.modal img {
-  max-width: 90%;
-  max-height: 90%;
-  box-shadow: 0 0 20px #000;
-}
-
 .remove-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #ff4081;
+  background: #FF4081; /* cor de remover */
   color: #fff;
   border: none;
   padding: 5px;
