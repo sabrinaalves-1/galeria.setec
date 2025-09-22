@@ -1,15 +1,27 @@
 // Função para adicionar uma foto à galeria
 function addPhoto() {
   const urlInput = document.getElementById('photoURL');
-  const url = urlInput.value.trim();
+  let url = urlInput.value.trim();
 
   if (!url) {
     alert("Insira um link válido da imagem.");
     return;
   }
 
-  // Testar se é uma URL de imagem válida (termina com jpg, png, gif, jpeg, ou url contendo "drive-storage" por exemplo)
-  const isValidImage = /\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(url) || url.includes("drive-storage");
+  // Converter link do Google Drive para link direto
+  const driveFileIdMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  const driveOpenIdMatch = url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+
+  if (driveFileIdMatch) {
+    const fileId = driveFileIdMatch[1];
+    url = `https://drive.google.com/uc?export=view&id=${fileId}`;
+  } else if (driveOpenIdMatch) {
+    const fileId = driveOpenIdMatch[1];
+    url = `https://drive.google.com/uc?export=view&id=${fileId}`;
+  }
+
+  // Validar se é um link de imagem válido (extensões comuns ou url com drive-storage)
+  const isValidImage = /\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(url) || url.includes("drive-storage") || url.includes("drive.google.com/uc");
 
   if (!isValidImage) {
     alert("Por favor, insira um link válido de imagem.");
