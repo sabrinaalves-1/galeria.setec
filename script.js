@@ -61,7 +61,11 @@ function displayGallery() {
     removeBtn.innerText = 'Remover';
     removeBtn.onclick = () => removePhoto(url);
 
+    const description = document.createElement('p');
+    description.innerText = 'Descrição da foto'; // Aqui você pode personalizar
+
     container.appendChild(img);
+    container.appendChild(description);
     container.appendChild(watermark);
     container.appendChild(removeBtn);
     gallery.appendChild(container);
@@ -82,8 +86,25 @@ function openModal(url) {
   modal.style.display = 'flex';
 }
 
+// Função para abrir a câmera (para capturar foto)
+function openCamera() {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+        document.body.appendChild(video);
+      })
+      .catch(function(error) {
+        alert("Não foi possível acessar a câmera.");
+      });
+  } else {
+    alert("Câmera não suportada neste navegador.");
+  }
+}
+
 // Inicializa a galeria ao carregar a página
 window.onload = function() {
   displayGallery();
 };
-
