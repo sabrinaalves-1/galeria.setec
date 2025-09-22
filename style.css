@@ -32,6 +32,17 @@ body{
   background:rgba(255,255,255,0.9);
   cursor:pointer;
 }
+.gallery-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* esquerda */
+  gap: 12px;
+}
+
+/* Para mover pro canto direito */
+.align-right {
+  align-self: flex-end;
+}
 
 /* Layout */
 .container{display:flex;gap:16px;padding:16px}
