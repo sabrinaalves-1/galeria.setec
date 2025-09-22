@@ -5,14 +5,13 @@
   --preto:#0a0a0a;
 }
 
-*{box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
-  margin:0;
-  font-family: Inter, system-ui, Arial;
+  font-family:Inter,sans-serif;
   background: linear-gradient(135deg,var(--azul-claro),var(--roxo-claro));
-  color:var(--preto);
-  min-height:100vh;
+  color: var(--preto);
+  min-height: 100vh;
 }
 
 /* Topo */
@@ -21,7 +20,7 @@ body{
   justify-content:space-between;
   align-items:center;
   padding:12px 20px;
-  background:linear-gradient(90deg,rgba(255,255,255,0.25),rgba(0,0,0,0.08));
+  background: linear-gradient(90deg, rgba(255,255,255,0.25), rgba(0,0,0,0.08));
   backdrop-filter: blur(6px);
 }
 .topbar .brand{font-weight:700}
@@ -37,18 +36,8 @@ body{
 
 /* Layout */
 .container{display:flex;gap:16px;padding:16px;flex-wrap:wrap}
-.sidebar{
-  flex: 0 0 260px;
-  padding:12px;
-  border-radius:12px;
-  background:rgba(255,255,255,0.5);
-}
-.gallery-area{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
+.sidebar{width:260px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.5)}
+.gallery-area{flex:1;display:flex;flex-direction:column;gap:12px}
 
 /* Dropzone */
 .dropzone{
@@ -60,38 +49,28 @@ body{
   cursor:pointer;
 }
 
-/* Títulos centralizados */
-.gallery-area h3 {
-  text-align: center;
-  margin: 16px 0 8px 0;
-  font-size: 1.2rem;
-}
+/* Títulos de cada dia */
+.gallery-area h3{text-align:center;margin:16px 0 8px 0;font-size:1.2rem;color:var(--preto)}
 
-/* Galeria responsiva em grid */
+/* Galeria */
 .gallery{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
   gap:12px;
   justify-content:center;
 }
 
-/* Cards quadrados com efeito flash */
+/* Cards */
 .card{
   position:relative;
   overflow:hidden;
-  border-radius:12px;
+  border-radius:10px;
   background:var(--branco);
   display:flex;
   flex-direction:column;
   aspect-ratio:1/1;
-  animation: flashBox 0.5s ease;
+  animation:flashBox 0.3s ease;
 }
-@keyframes flashBox{
-  0%{opacity:0;transform:scale(0.8)}
-  100%{opacity:1;transform:scale(1)}
-}
-
-/* Imagem com object-fit */
 .card img{
   width:100%;
   height:100%;
@@ -99,17 +78,18 @@ body{
   display:block;
   transition:transform .28s ease, filter .28s ease;
 }
-
-/* Hover zoom */
-.card:hover img{
-  transform:scale(1.05);
-  filter:contrast(1.05) saturate(1.05)
+.card .desc{
+  padding:6px;
+  font-size:0.85rem;
+  text-align:center;
+  background:rgba(255,255,255,0.8);
 }
-
-/* Descrição e ações */
-.card .desc{padding:6px;font-size:0.85rem;text-align:center}
 .card .actions{
-  position:absolute;top:6px;right:6px;display:flex;gap:6px
+  position:absolute;
+  top:6px;
+  right:6px;
+  display:flex;
+  gap:4px;
 }
 .card .actions button{
   background:rgba(0,0,0,0.6);
@@ -119,109 +99,9 @@ body{
   border-radius:6px;
   cursor:pointer
 }
-
-/* Modal */
-.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1200}
-.modal.hidden{display:none}
-.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.5)}
-.modal-content{
-  position:relative;z-index:2;
-  background:var(--branco);
-  padding:12px;
-  border-radius:12px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
-  max-width:90vw;
-}
-.modal-content img{
-  max-width:90vw;
-  height:auto;
-  transition:transform .2s ease, filter .2s ease
-}
-.modal-controls{display:flex;gap:8px}
-.modal-controls button{padding:6px 10px;border-radius:8px;border:0}
-.modal-desc{max-width:90vw;text-align:center}
-
-/* Responsivo */
-@media(max-width:900px){
-  .container{flex-direction:column}
-  .sidebar{width:100%}
-  .gallery{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
-}
-@media(max-width:480px){
-  .gallery{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
-  .card .desc{font-size:0.75rem}
-}
-}
-.menu button:hover{transform:scale(1.05);}
-
-/* Layout */
-.container{display:flex;gap:16px;padding:16px}
-.sidebar{width:260px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.5);}
-.gallery-area{flex:1;display:flex;flex-direction:column;gap:12px;}
-
-/* Dropzone */
-.dropzone{
-  padding:18px;
-  border-radius:12px;
-  border:2px dashed rgba(0,0,0,0.12);
-  text-align:center;
-  background:rgba(255,255,255,0.25);
-  cursor:pointer;
-  transition:all .3s ease;
-}
-.dropzone.drag{background:rgba(255,255,255,0.35);border-color:rgba(0,0,0,0.25);}
-
-/* Títulos */
-.gallery-area h3{text-align:center;margin:16px 0 8px;font-size:1.2rem;color:var(--preto);}
-
-/* Galeria Quadrada estilo FlashBox */
-.gallery{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-  gap:12px;
-  justify-content:center;
-}
-.card{
-  position:relative;
-  overflow:hidden;
-  border-radius:10px;
-  background:var(--branco);
-  display:flex;
-  flex-direction:column;
-  animation: flashBox 0.6s ease;
-}
-.card img{
-  width:100%;
-  aspect-ratio:1/1; /* deixa quadrado */
-  object-fit:cover;
-  display:block;
-  transition:transform .28s ease, filter .28s ease;
-}
 .card:hover img{
   transform:scale(1.05);
-  filter:contrast(1.05) saturate(1.05);
-}
-.card .desc{padding:8px;font-size:0.9rem;text-align:center;}
-.card .actions{
-  position:absolute;top:8px;right:8px;display:flex;gap:6px;
-}
-.card .actions button{
-  background:rgba(0,0,0,0.6);
-  color:white;
-  border:0;
-  padding:6px;
-  border-radius:6px;
-  cursor:pointer
-}
-
-/* FlashBox animation */
-@keyframes flashBox{
-  0%{transform:scale(0.9);opacity:0.2;}
-  50%{transform:scale(1.05);opacity:1;}
-  100%{transform:scale(1);opacity:1;}
+  filter:contrast(1.05) saturate(1.05)
 }
 
 /* Modal */
@@ -240,8 +120,8 @@ body{
   max-width:90vw
 }
 .modal-content img{
-  max-width:33vw;
-  width:33vw;
+  max-width:70vw;
+  width:70vw;
   height:auto;
   transition:transform .2s ease, filter .2s ease
 }
@@ -249,15 +129,21 @@ body{
 .modal-controls button{padding:8px 10px;border-radius:8px;border:0}
 .modal-desc{max-width:90vw;text-align:center}
 
+/* Efeito Flash Box */
+@keyframes flashBox{
+  0%{opacity:0;transform:scale(0.95)}
+  100%{opacity:1;transform:scale(1)}
+}
+
 /* Responsivo */
 @media (max-width:900px){
   .container{flex-direction:column}
   .sidebar{width:100%}
-  .gallery{grid-template-columns:repeat(2,1fr)}
-  .modal-content img{max-width:70vw;width:70vw}
+  .gallery{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}
+  .modal-content img{max-width:80vw;width:80vw}
 }
 @media (max-width:480px){
-  .gallery{grid-template-columns:repeat(1,1fr)}
+  .gallery{grid-template-columns:repeat(auto-fit,minmax(80px,1fr))}
   .card img{height:auto}
   .modal-content img{max-width:90vw;width:90vw}
 }
