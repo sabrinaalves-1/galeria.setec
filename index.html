@@ -3,44 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galeria de Fotos</title>
+  <title>Galeria Barbosa</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>📸 Minha Galeria</h1>
-  </header>
+  <h2>Galeria • Barbosa</h2>
+  <button id="addBtn">Adicionar</button>
+  <button id="cameraBtn">Camera</button>
+  <button id="urlBtn">Adicionar por URL</button>
+  <button id="clearBtn">Limpar tudo</button>
 
-  <main class="container">
-    <aside class="sidebar">
-      <h2>Adicionar Foto</h2>
-      <p>Escolha o dia da galeria antes de enviar uma imagem:</p>
+  <h3>Instruções</h3>
+  <p>
+    Use o botão <b>Camera</b> para abrir a câmera (mobile/desktop que suportar).  
+    Ou arraste imagens para a área principal.  
+  </p>
+  <p>
+    Ao adicionar via URL, o site fará o download da imagem, aplicará a marca d'água e salvará localmente.
+  </p>
+  <p>Escolha o <b>dia</b> antes de enviar:</p>
+  <select id="daySelect">
+    <option value="1">Dia 1</option>
+    <option value="2">Dia 2</option>
+    <option value="3">Dia 3</option>
+  </select>
 
-      <label for="daySelect">Dia:</label>
-      <select id="daySelect">
-        <option value="1">Dia 1</option>
-        <option value="2">Dia 2</option>
-        <option value="3">Dia 3</option>
-      </select>
+  <h3>📅 Dia 1</h3>
+  <div id="gallery1" class="gallery"></div>
 
-      <input type="file" id="fileInput" accept="image/*">
-      <input type="text" id="descInput" placeholder="Descrição da imagem">
-      <button id="addBtn">Adicionar</button>
-    </aside>
+  <h3>📅 Dia 2</h3>
+  <div id="gallery2" class="gallery"></div>
 
-    <section class="gallery-area">
-      <h2>📅 Dia 1</h2>
-      <div id="gallery1" class="gallery"></div>
+  <h3>📅 Dia 3</h3>
+  <div id="gallery3" class="gallery"></div>
 
-      <h2>📅 Dia 2</h2>
-      <div id="gallery2" class="gallery"></div>
-
-      <h2>📅 Dia 3</h2>
-      <div id="gallery3" class="gallery"></div>
-    </section>
-  </main>
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox">
+    <span class="close">&times;</span>
+    <img id="lightbox-img" src="" alt="">
+    <p id="lightbox-desc"></p>
+  </div>
 
   <script src="app.js"></script>
 </body>
 </html>
-
