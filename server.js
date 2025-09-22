@@ -1,60 +1,35 @@
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
+const PORT = 3000;
+
+// Pasta para salvar imagens
+const UPLOAD_DIR = path.join(__dirname, 'uploads');
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
+
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
+app.use('/uploads', express.static(UPLOAD_DIR));
 
-// Pasta para salvar uploads
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-
-// Configuração do Multer
+// Configuração do multer
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, Date.now() + '_' + file.originalname)
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage });
 
-// Lista de imagens
-let images = [];
-const dbFile = path.join(__dirname, 'images.json');
-if (fs.existsSync(dbFile)) {
-  images = JSON.parse(fs.readFileSync(dbFile));
-}
-
-// Endpoint para upload de imagem
+// Rota para upload
 app.post('/upload', upload.single('image'), (req, res) => {
-  const { dia } = req.body;
-  if (!req.file) return res.status(400).send('Nenhuma imagem enviada');
-
-  const img = {
-    url: '/uploads/' + req.file.filename,
-    desc: req.file.originalname,
-    dia: parseInt(dia) || 1,
-    createdAt: Date.now()
-  };
-  images.unshift(img);
-
-  fs.writeFileSync(dbFile, JSON.stringify(images, null, 2));
-  res.json(img);
+  const dia = parseInt(req.body.dia) || 1;
+  if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+  
+  const url = `/uploads/${req.file.filename}`;
+  res.json({ url, dia, name: req.file.originalname });
 });
 
-// Endpoint para listar imagens
-app.get('/images', (req, res) => {
-  if (fs.existsSync(dbFile)) {
-    images = JSON.parse(fs.readFileSync(dbFile));
-  }
-  res.json(images);
-});
-
-// Servir a pasta de uploads
-app.use('/uploads', express.static(uploadDir));
-
-// Iniciar servidor
-const PORT = 3000;
 app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
