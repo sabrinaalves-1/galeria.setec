@@ -3,25 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galeria de Fotos</title>
+  <title>Minha Galeria de Fotos</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Menu -->
   <header>
-    <h1>Minha Galeria de Fotos</h1>
+    <div class="menu">
+      <button onclick="openCamera()">📸 Abrir Câmera</button>
+      <h1>Minha Galeria de Fotos</h1>
+    </div>
   </header>
 
+  <!-- Seção de Adicionar Foto -->
   <main>
     <section class="add-photo">
       <input type="text" id="photoURL" placeholder="Cole o link da imagem aqui">
       <button onclick="addPhoto()">Adicionar Foto</button>
     </section>
 
+    <!-- Galeria -->
     <section class="gallery" id="gallery">
       <!-- Fotos adicionadas vão aqui -->
     </section>
   </main>
+
+  <!-- Rodapé -->
+  <footer>
+    <div class="footer-content">
+      <p>© 2025 Minha Galeria - Todos os direitos reservados</p>
+    </div>
+  </footer>
 
   <script src="script.js"></script>
 </body>
