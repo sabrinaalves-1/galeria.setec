@@ -1,7 +1,11 @@
 const daySelect = document.getElementById("daySelect");
-const fileInput = document.getElementById("fileInput");
-const descInput = document.getElementById("descInput");
 const addBtn = document.getElementById("addBtn");
+const clearBtn = document.getElementById("clearBtn");
+
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightbox-img");
+const lightboxDesc = document.getElementById("lightbox-desc");
+const closeBtn = document.querySelector(".lightbox .close");
 
 // Função para criar card
 function createCard(foto) {
@@ -12,53 +16,57 @@ function createCard(foto) {
   card.innerHTML = `
     <img src="${foto.src}" alt="foto">
     <div class="desc">${foto.desc || "Sem descrição"}</div>
-    <div class="actions">
-      <button class="remove">🗑</button>
-    </div>
   `;
 
-  // Remover imagem
-  card.querySelector(".remove").addEventListener("click", () => {
-    card.remove();
-    let fotos = JSON.parse(localStorage.getItem("fotos")) || [];
-    fotos = fotos.filter(f => !(f.src === foto.src && f.dia === foto.dia));
-    localStorage.setItem("fotos", JSON.stringify(fotos));
+  // Lightbox ao clicar
+  card.querySelector("img").addEventListener("click", () => {
+    lightbox.style.display = "flex";
+    lightboxImg.src = foto.src;
+    lightboxDesc.textContent = foto.desc || "Sem descrição";
   });
 
   gallery.appendChild(card);
 }
 
-// Adicionar nova imagem
-addBtn.addEventListener("click", () => {
-  const file = fileInput.files[0];
-  const desc = descInput.value;
-  const dia = daySelect.value;
-
-  if (!file) {
-    alert("Selecione uma imagem primeiro!");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const foto = { src: e.target.result, desc, dia };
-    createCard(foto);
-
-    // Salva no localStorage
-    let fotos = JSON.parse(localStorage.getItem("fotos")) || [];
-    fotos.push(foto);
-    localStorage.setItem("fotos", JSON.stringify(fotos));
-
-    // Limpa campos
-    fileInput.value = "";
-    descInput.value = "";
-  };
-  reader.readAsDataURL(file);
+// Fechar lightbox
+closeBtn.addEventListener("click", () => {
+  lightbox.style.display = "none";
 });
 
-// Carregar imagens salvas
+// Clicar fora da imagem fecha também
+lightbox.addEventListener("click", (e) => {
+  if (e.target === lightbox) {
+    lightbox.style.display = "none";
+  }
+});
+
+// Exemplo de adicionar imagem (pode adaptar com câmera/URL como antes)
+addBtn.addEventListener("click", () => {
+  const dia = daySelect.value;
+  const foto = {
+    src: "https://via.placeholder.com/300x200.png?text=Imagem",
+    desc: "Exemplo de imagem",
+    dia
+  };
+
+  createCard(foto);
+
+  // Salvar no localStorage
+  let fotos = JSON.parse(localStorage.getItem("fotos")) || [];
+  fotos.push(foto);
+  localStorage.setItem("fotos", JSON.stringify(fotos));
+});
+
+// Limpar tudo
+clearBtn.addEventListener("click", () => {
+  localStorage.removeItem("fotos");
+  document.querySelectorAll(".gallery").forEach(g => g.innerHTML = "");
+});
+
+// Carregar salvas
 function loadImages() {
   let fotos = JSON.parse(localStorage.getItem("fotos")) || [];
   fotos.forEach(f => createCard(f));
 }
 loadImages();
+
