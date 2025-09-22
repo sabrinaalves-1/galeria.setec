@@ -1,4 +1,4 @@
-// Função para adicionar uma foto à galeria
+// Adicionar imagem por link
 function addPhoto() {
   const urlInput = document.getElementById('photoURL');
   const url = urlInput.value.trim();
@@ -8,36 +8,27 @@ function addPhoto() {
     return;
   }
 
-  // Salvar a nova URL no localStorage
   let photos = JSON.parse(localStorage.getItem('photos')) || [];
   photos.push(url);
   localStorage.setItem('photos', JSON.stringify(photos));
 
-  // Atualizar a galeria
   displayGallery();
-
-  // Limpar o campo de entrada
   urlInput.value = '';
 }
 
-// Função para remover uma imagem
+// Remover imagem
 function removePhoto(url) {
   let photos = JSON.parse(localStorage.getItem('photos')) || [];
-  photos = photos.filter(photo => photo !== url); // Remove a URL da lista
-
-  // Atualizar o localStorage
+  photos = photos.filter(photo => photo !== url);
   localStorage.setItem('photos', JSON.stringify(photos));
-
-  // Atualizar a galeria
   displayGallery();
 }
 
-// Função para exibir as fotos da galeria
+// Exibir galeria
 function displayGallery() {
   const gallery = document.getElementById('gallery');
-  gallery.innerHTML = ''; // Limpa a galeria antes de repopular
+  gallery.innerHTML = '';
 
-  // Recuperar as fotos do localStorage
   const photos = JSON.parse(localStorage.getItem('photos')) || [];
 
   photos.forEach(url => {
@@ -48,9 +39,10 @@ function displayGallery() {
     img.src = url;
     img.alt = 'Foto da galeria';
     img.crossOrigin = 'anonymous';
-
-    // Clique para ampliar
     img.addEventListener('click', () => openModal(url));
+
+    const description = document.createElement('p');
+    description.innerText = 'Descrição da foto';
 
     const watermark = document.createElement('div');
     watermark.className = 'watermark';
@@ -61,22 +53,19 @@ function displayGallery() {
     removeBtn.innerText = 'Remover';
     removeBtn.onclick = () => removePhoto(url);
 
-    const description = document.createElement('p');
-    description.innerText = 'Descrição da foto'; // Aqui você pode personalizar
-
     container.appendChild(img);
     container.appendChild(description);
     container.appendChild(watermark);
     container.appendChild(removeBtn);
+
     gallery.appendChild(container);
   });
 }
 
-// Função para abrir a imagem no modal
+// Modal
 const modal = document.createElement('div');
 modal.className = 'modal';
 modal.addEventListener('click', () => modal.style.display = 'none');
-
 const modalImg = document.createElement('img');
 modal.appendChild(modalImg);
 document.body.appendChild(modal);
@@ -86,25 +75,15 @@ function openModal(url) {
   modal.style.display = 'flex';
 }
 
-// Função para abrir a câmera (para capturar foto)
-function openCamera() {
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(function(stream) {
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        video.play();
-        document.body.appendChild(video);
-      })
-      .catch(function(error) {
-        alert("Não foi possível acessar a câmera.");
-      });
-  } else {
-    alert("Câmera não suportada neste navegador.");
-  }
-}
+// Tirar foto com a câmera ou galeria
+function handleCameraPhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
-// Inicializa a galeria ao carregar a página
-window.onload = function() {
-  displayGallery();
-};
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const base64Image = e.target.result;
+
+    let photos = JSON.parse(localStorage.getItem('photos')) || [];
+    photos.push(base64Image);
+    localStorage.setItem('photos
