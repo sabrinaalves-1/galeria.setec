@@ -94,27 +94,76 @@ body{
 }
 
 
-/* Modal (imagem ampliada) */
-.modal{
-  display:none;
-  position:fixed;
-  z-index:2000;
-  left:0;
-  top:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.8);
-  justify-content:center;
-  align-items:center;
-  padding:10px;
+/* ===== Modal ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
 }
-.modal img{
-  max-width:90vw;   /* ocupa no máximo 90% da largura da tela */
-  max-height:80vh;  /* ocupa no máximo 80% da altura da tela */
-  border-radius:12px;
-  box-shadow:0 0 25px rgba(0,0,0,0.8);
-  object-fit:contain; /* mantém proporção sem estourar */
+
+.modal.hidden {
+  display: none;
 }
+
+/* Fundo escuro atrás */
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+}
+
+/* Caixa do modal */
+.modal-content {
+  position: relative;
+  z-index: 2;
+  background: var(--branco);
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 90vw;   /* limite horizontal da caixa */
+  max-height: 90vh;  /* limite vertical da caixa */
+  overflow: hidden;
+}
+
+/* Imagem ampliada */
+.modal-content img {
+  max-width: 90vw;   /* nunca passa da largura da tela */
+  max-height: 80vh;  /* nunca passa da altura da tela */
+  width: auto;       /* largura automática */
+  height: auto;      /* altura automática */
+  object-fit: contain; /* mantém proporção */
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.8);
+  transition: transform .2s ease, filter .2s ease;
+}
+
+/* Botões dentro do modal */
+.modal-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-controls button {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 0;
+  cursor: pointer;
+}
+
+/* Texto descritivo */
+.modal-desc {
+  max-width: 90vw;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--texto, #333);
+}
+
 
 /* Efeito Flash Box */
 @keyframes flashBox{
