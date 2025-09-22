@@ -1,7 +1,5 @@
 const STORAGE_KEY = 'galeriaFotos_v1';
-const gallery1El = document.getElementById('gallery1');
-const gallery2El = document.getElementById('gallery2');
-const gallery3El = document.getElementById('gallery3');
+const galleries = [document.getElementById('gallery1'), document.getElementById('gallery2'), document.getElementById('gallery3')];
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
 const btnAdd = document.getElementById('btnAdd');
@@ -12,10 +10,9 @@ const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modalImg');
 const modalDesc = document.getElementById('modalDesc');
 const modalBackdrop = document.getElementById('modalBackdrop');
-const closeModal = document.getElementById('closeModal');
+const closeModalBtn = document.getElementById('closeModal');
 const zoomIn = document.getElementById('zoomIn');
 const zoomOut = document.getElementById('zoomOut');
-const daySelect = document.getElementById('daySelect');
 let currentScale = 1;
 
 let items = load();
@@ -61,12 +58,12 @@ dropzone.addEventListener('click', ()=> fileInput.click());
 
 // Modal
 modalBackdrop.addEventListener('click', closeModalFn);
-closeModal.addEventListener('click', closeModalFn);
-zoomIn.addEventListener('click', ()=>{
+closeModalBtn?.addEventListener('click', closeModalFn);
+zoomIn?.addEventListener('click', ()=>{
   currentScale = Math.min(3, currentScale+0.2);
   modalImg.style.transform = `scale(${currentScale})`;
 });
-zoomOut.addEventListener('click', ()=>{
+zoomOut?.addEventListener('click', ()=>{
   currentScale = Math.max(0.3, currentScale-0.2);
   modalImg.style.transform = `scale(${currentScale})`;
 });
@@ -89,11 +86,13 @@ async function addFile(file){
   if(!file.type.startsWith('image/')) return;
   const dataUrl = await fileToDataURL(file);
   const watermarked = await applyWatermark(dataUrl);
+  const dia = prompt('Em qual dia deseja adicionar? (1,2 ou 3)', '1') || '1';
   const item = {
     id: randomId(),
     dataUrl: watermarked,
     desc: file.name,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    dia: Math.min(3, Math.max(1, parseInt(dia)))
   };
   items.unshift(item); save(); render();
 }
@@ -104,92 +103,50 @@ async function addImageFromUrl(url){
   if(!blob.type.startsWith('image/')) throw new Error('Não é uma imagem');
   const dataUrl = await blobToDataURL(blob);
   const watermarked = await applyWatermark(dataUrl);
+  const dia = prompt('Em qual dia deseja adicionar? (1,2 ou 3)', '1') || '1';
   const item = {
     id: randomId(),
     dataUrl: watermarked,
     desc: url,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    dia: Math.min(3, Math.max(1, parseInt(dia)))
   };
   items.unshift(item); save(); render();
   return true;
 }
 
 // Helpers
-function fileToDataURL(file){
-  return new Promise((res,rej)=>{
-    const r = new FileReader();
-    r.onload = ()=>res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-function blobToDataURL(blob){
-  return new Promise((res,rej)=>{
-    const r = new FileReader();
-    r.onload = ()=>res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(blob);
-  });
-}
-function applyWatermark(dataUrl){
-  return new Promise((res)=>{
-    const img = new Image(); img.crossOrigin='anonymous';
-    img.onload = ()=>{
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width; canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img,0,0);
-      ctx.fillStyle = 'rgba(0,0,0,0.18)';
-      ctx.fillRect(20, img.height-60, img.width-40, 50);
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.font = Math.round(Math.max(12, img.width*0.02)) + 'px sans-serif';
-      ctx.fillText('Galeria • Barbosa', 30, img.height-30);
-      res(canvas.toDataURL('image/jpeg',0.9));
-    };
-    img.onerror = ()=>res(dataUrl);
-    img.src = dataUrl;
-  });
-}
-function randomId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function fileToDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});}
+function blobToDataURL(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob);});}
+function applyWatermark(dataUrl){return new Promise((res)=>{const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{const canvas=document.createElement('canvas');canvas.width=img.width;canvas.height=img.height;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);ctx.fillStyle='rgba(0,0,0,0.18)';ctx.fillRect(20,img.height-60,img.width-40,50);ctx.fillStyle='rgba(255,255,255,0.85)';ctx.font=Math.round(Math.max(12,img.width*0.02))+'px sans-serif';ctx.fillText('Galeria • Barbosa',30,img.height-30);res(canvas.toDataURL('image/jpeg',0.9));};img.onerror=()=>res(dataUrl);img.src=dataUrl;});}
+function randomId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
 
 // Renderização
 function render(){
-  gallery1El.innerHTML='';
-  gallery2El.innerHTML='';
-  gallery3El.innerHTML='';
-
+  galleries.forEach(g=>g.innerHTML='');
   if(items.length===0){
-    gallery1El.innerHTML='<p>Nenhuma imagem</p>';
-    gallery2El.innerHTML='<p>Nenhuma imagem</p>';
-    gallery3El.innerHTML='<p>Nenhuma imagem</p>';
+    galleries.forEach(g=>g.innerHTML='<p>Nenhuma imagem</p>');
     return;
   }
-
   for(const item of items){
-    const card = document.createElement('article'); card.className='card';
-    const img = document.createElement('img'); img.src=item.dataUrl; img.alt=item.desc||'';
-    img.addEventListener('click', ()=>openModal(item));
-    const desc = document.createElement('div'); desc.className='desc'; desc.textContent=item.desc||'';
-    const actions = document.createElement('div'); actions.className='actions';
-    const btnDownload = document.createElement('button'); btnDownload.textContent='⬇';
-    btnDownload.addEventListener('click', ()=>downloadDataUrl(item.dataUrl, (item.desc||'imagem')+'.jpg'));
-    const btnRemove = document.createElement('button'); btnRemove.textContent='✖';
-    btnRemove.addEventListener('click', ()=>{
-      if(confirm('Remover esta imagem?')){
-        items = items.filter(i=>i.id!==item.id); save(); render();
-      }
-    });
+    const card=document.createElement('article'); card.className='card';
+    const img=document.createElement('img'); img.src=item.dataUrl; img.alt=item.desc||'';
+    img.addEventListener('click',()=>openModal(item));
+    const desc=document.createElement('div'); desc.className='desc'; desc.textContent=item.desc||'';
+    const actions=document.createElement('div'); actions.className='actions';
+    const btnDownload=document.createElement('button'); btnDownload.textContent='⬇';
+    btnDownload.addEventListener('click',()=>downloadDataUrl(item.dataUrl,(item.desc||'imagem')+'.jpg'));
+    const btnRemove=document.createElement('button'); btnRemove.textContent='✖';
+    btnRemove.addEventListener('click',()=>{if(confirm('Remover esta imagem?')){items=items.filter(i=>i.id!==item.id);save();render();}});
     actions.appendChild(btnDownload); actions.appendChild(btnRemove);
     card.appendChild(img); card.appendChild(actions); card.appendChild(desc);
-
-    const g = document.getElementById('gallery'+(item.dia||1));
-    g.appendChild(card);
+    galleries[item.dia-1].appendChild(card);
   }
 }
 
 // Download
-function downloadDataUrl(dataUrl, filename){
-  const a = document.createElement('a');
-  a.href=dataUrl; a.download=filename;
-  document.body.appendChild(a); a.click(); a.remove();
+function downloadDataUrl(dataUrl,filename){
+  const a=document.createElement('a');
+  a.href=dataUrl;a.download=filename;
+  document.body.appendChild(a);a.click();a.remove();
 }
