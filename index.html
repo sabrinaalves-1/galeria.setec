@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minha Galeria de Fotos</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <!-- Menu -->
   <header>
     <div class="menu">
-      <button onclick="openCamera()">📸 Abrir Câmera</button>
+      <button onclick="document.getElementById('cameraInput').click()">📷 Tirar Foto</button>
       <h1>Minha Galeria de Fotos</h1>
     </div>
   </header>
@@ -19,13 +19,18 @@
   <!-- Seção de Adicionar Foto -->
   <main>
     <section class="add-photo">
-      <input type="text" id="photoURL" placeholder="Cole o link da imagem aqui">
+      <input type="text" id="photoURL" placeholder="Cole o link da imagem aqui" />
       <button onclick="addPhoto()">Adicionar Foto</button>
+
+      <!-- Botão de câmera -->
+      <div class="camera-upload">
+        <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display: none" onchange="handleCameraPhoto(event)" />
+      </div>
     </section>
 
     <!-- Galeria -->
     <section class="gallery" id="gallery">
-      <!-- Fotos adicionadas vão aqui -->
+      <!-- Fotos aparecem aqui -->
     </section>
   </main>
 
