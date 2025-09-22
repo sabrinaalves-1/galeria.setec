@@ -49,8 +49,9 @@ function displayGallery() {
     img.alt = 'Foto da galeria';
     img.crossOrigin = 'anonymous';
 
-    // Clique para ampliar
-    img.addEventListener('click', () => openModal(url));
+    // Adicionar descrição
+    const description = document.createElement('p');
+    description.textContent = 'Descrição da foto';
 
     const watermark = document.createElement('div');
     watermark.className = 'watermark';
@@ -62,28 +63,32 @@ function displayGallery() {
     removeBtn.onclick = () => removePhoto(url);
 
     container.appendChild(img);
+    container.appendChild(description);
     container.appendChild(watermark);
     container.appendChild(removeBtn);
     gallery.appendChild(container);
   });
 }
 
-// Função para abrir a imagem no modal
-const modal = document.createElement('div');
-modal.className = 'modal';
-modal.addEventListener('click', () => modal.style.display = 'none');
-
-const modalImg = document.createElement('img');
-modal.appendChild(modalImg);
-document.body.appendChild(modal);
-
-function openModal(url) {
-  modalImg.src = url;
-  modal.style.display = 'flex';
+// Função para abrir a câmera (para capturar foto)
+function openCamera() {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+        document.body.appendChild(video);
+      })
+      .catch(function(error) {
+        alert("Não foi possível acessar a câmera.");
+      });
+  } else {
+    alert("Câmera não suportada neste navegador.");
+  }
 }
 
 // Inicializa a galeria ao carregar a página
 window.onload = function() {
   displayGallery();
 };
-
