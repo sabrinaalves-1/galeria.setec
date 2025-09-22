@@ -1,1 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galeria de Fotos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+  <header>
+    <h1>Minha Galeria de Fotos</h1>
+  </header>
+
+  <main>
+    <section class="add-photo">
+      <input type="text" id="photoURL" placeholder="Cole o link da imagem aqui">
+      <button onclick="addPhoto()">Adicionar Foto</button>
+    </section>
+
+    <section class="gallery" id="gallery">
+      <!-- Fotos adicionadas vão aqui -->
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
