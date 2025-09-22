@@ -22,7 +22,8 @@
       <h2>Instruções</h2>
       <p>Use o botão <strong>Câmera</strong> para abrir a câmera e tirar fotos.</p>
       <p>Ou arraste imagens para a área principal.</p>
-      <p>Ao adicionar via URL, o site fará o download da imagem, aplicará a marca d'água e salvará localmente.</p>
+      <p>Ao adicionar via URL, o site fará o download da imagem, aplicará a marca d'água e enviará para o servidor Node.js.</p>
+      <p>O botão <strong>Adicionar</strong> abre o seletor de arquivos do seu dispositivo.</p>
     </aside>
 
     <section class="gallery-area">
@@ -55,10 +56,10 @@
     </div>
   </div>
 
-  <!-- Input de arquivos -->
+  <!-- Inputs de arquivos -->
   <input id="fileInput" type="file" accept="image/*" multiple style="display:none">
-  <input id="cameraInput" type="file" accept="image/*" capture="environment" style="display:none">
-
+  
+  <!-- Script JS atualizado para Node.js -->
   <script src="script.js" defer></script>
 </body>
 </html>
