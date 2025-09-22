@@ -41,16 +41,32 @@ body{
   border-radius:12px;
   background:rgba(255,255,255,0.5)
 }
-.gallery-area{flex:1;display:flex;flex-direction:column;gap:12px}
-.dropzone{
-  padding:18px;
-  border-radius:12px;
-  border:2px dashed rgba(0,0,0,0.12);
-  text-align:center;
-  background:rgba(255,255,255,0.25);
-  cursor:pointer
+.gallery-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center; /* Centraliza horizontalmente */
+  text-align: center;  /* Centraliza títulos e textos */
 }
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  justify-items: center; /* Centraliza os cards dentro da grid */
+}
+
+.dropzone {
+  padding: 18px;
+  border-radius: 12px;
+  border: 2px dashed rgba(0,0,0,0.12);
+  text-align: center;
+  background: rgba(255,255,255,0.25);
+  cursor: pointer;
+  width: 80%; /* Deixa a dropzone menor que a tela para centralizar */
+  max-width: 600px;
+}
 
 /* Cards */
 .card{
