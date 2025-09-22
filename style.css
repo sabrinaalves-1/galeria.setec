@@ -55,12 +55,12 @@ body{
 /* Galeria */
 .gallery{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  grid-template-columns:repeat(3,1fr);
   gap:12px;
   justify-content:center;
 }
 
-/* Cards */
+/* Cards quadrados */
 .card{
   position:relative;
   overflow:hidden;
@@ -70,6 +70,7 @@ body{
   flex-direction:column;
   aspect-ratio:1/1;
   animation:flashBox 0.3s ease;
+  cursor:pointer;
 }
 .card img{
   width:100%;
@@ -84,24 +85,9 @@ body{
   text-align:center;
   background:rgba(255,255,255,0.8);
 }
-.card .actions{
-  position:absolute;
-  top:6px;
-  right:6px;
-  display:flex;
-  gap:4px;
-}
-.card .actions button{
-  background:rgba(0,0,0,0.6);
-  color:white;
-  border:0;
-  padding:4px 6px;
-  border-radius:6px;
-  cursor:pointer
-}
 .card:hover img{
   transform:scale(1.05);
-  filter:contrast(1.05) saturate(1.05)
+  filter:contrast(1.05) saturate(1.05);
 }
 
 /* Modal */
@@ -139,11 +125,11 @@ body{
 @media (max-width:900px){
   .container{flex-direction:column}
   .sidebar{width:100%}
-  .gallery{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}
+  .gallery{grid-template-columns:repeat(2,1fr)}
   .modal-content img{max-width:80vw;width:80vw}
 }
 @media (max-width:480px){
-  .gallery{grid-template-columns:repeat(auto-fit,minmax(80px,1fr))}
+  .gallery{grid-template-columns:repeat(1,1fr)}
   .card img{height:auto}
   .modal-content img{max-width:90vw;width:90vw}
 }
