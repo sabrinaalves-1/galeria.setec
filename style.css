@@ -1,41 +1,18 @@
-/* Corpo */
 body {
   font-family: Arial, sans-serif;
+  background: #121212;
+  color: #fff;
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom, #4FC3F7, #6A1B9A); /* Degradê Azul e Roxo */
-  color: #fff;
 }
 
-/* Cabeçalho */
 header {
-  background-color: #212121;
+  background: #6a4fef; /* roxo claro */
   padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
-/* Menu */
-.menu button {
-  background-color: #00B0FF;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.menu h1 {
-  font-size: 24px;
-  margin: 0;
-}
-
-/* Seção de adicionar foto */
 .add-photo {
   text-align: center;
   margin: 20px;
@@ -47,13 +24,11 @@ header {
   border-radius: 5px;
   border: none;
   margin-right: 10px;
-  background: #4F83CC;
-  color: #fff;
 }
 
 .add-photo button {
   padding: 10px 20px;
-  background: #6C63FF;
+  background: #4fc3f7; /* azul claro */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -61,10 +36,9 @@ header {
   font-weight: bold;
 }
 
-/* Galeria */
 .gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 15px;
   padding: 20px;
 }
@@ -74,8 +48,6 @@ header {
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s;
-  background: #212121;
-  border-radius: 8px;
 }
 
 .photo-container img {
@@ -96,46 +68,41 @@ header {
   right: 10px;
   color: rgba(255, 255, 255, 0.7);
   font-size: 12px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0,0,0,0.5);
   padding: 2px 6px;
   border-radius: 3px;
   pointer-events: none;
 }
 
-.photo-container p {
-  color: #fff;
-  text-align: center;
-  padding: 10px;
-  margin: 0;
-}
-
-/* Rodapé */
-footer {
-  background: #212121;
-  padding: 20px;
-  text-align: center;
+/* Modal */
+.modal {
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  bottom: 0;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  display: none;
+}
+
+.modal img {
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 0 20px #000;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff4081;
   color: #fff;
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
 }
-
-.footer-content p {
-  margin: 0;
-}
-
-/* Responsividade para dispositivos móveis */
-@media (max-width: 768px) {
-  .add-photo input {
-    width: 80%;
-  }
-
-  .menu button {
-    font-size: 14px;
-  }
-
-  .gallery {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  }
-}
-
