@@ -93,8 +93,7 @@ async function addFile(file){
     id: randomId(),
     dataUrl: watermarked,
     desc: file.name,
-    createdAt: Date.now(),
-    dia: daySelect.value
+    createdAt: Date.now()
   };
   items.unshift(item); save(); render();
 }
@@ -109,8 +108,7 @@ async function addImageFromUrl(url){
     id: randomId(),
     dataUrl: watermarked,
     desc: url,
-    createdAt: Date.now(),
-    dia: daySelect.value
+    createdAt: Date.now()
   };
   items.unshift(item); save(); render();
   return true;
